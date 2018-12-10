@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.example.user.myapplication.CallWebService.Configuration;
+
 import java.util.Formatter;
 
 import static android.view.MotionEvent.ACTION_DOWN;
@@ -35,11 +37,13 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     String METHOD_NAME = "add";
     String PARAMETER_NAME_I = "i";
     String PARAMETER_NAME_J = "j";
+    String PARAMETER_IMAGE_WIDTH = "image_width";
+    String PARAMETER_IMAGE_HEIGHT = "image_height";
+    String PARAMETER_ZOOM_LEVEL = "zoom_level";
 
     Double topX = 0d;
     Double topY = 0d;
     Integer zoomLevel = 1;
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -82,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
             @Override
             public void onClick(View v) {
                 zoomLevel++;
+
+                loadImage();
             }
         });
 
@@ -94,21 +100,38 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         this.topX += dX;
         this.topY += dY;
 
-        loadImage(this.topX, this.topY);
+        loadImage();
     }
 
-    private void loadImage(double i, double j){
-        getSoapService().execute(i, j);
+    private void loadImage(){
+
+        CallWebService.RequestParameters parameters = new CallWebService.RequestParameters();
+        parameters.i = this.topX;
+        parameters.j = this.topY;
+        parameters.zoom_level = zoomLevel;
+        parameters.image_width = image_view.getLayoutParams().width;
+        parameters.image_height = image_view.getLayoutParams().height;
+
+        getSoapService().execute(parameters);
     }
+
+
+    public int convertDipToPixels(float dips)
+    {
+        return (int) (dips * getResources().getDisplayMetrics().density + 0.5f);
+    }
+
 
     private CallWebService getSoapService(){
-        CallWebService.Configuration result = new CallWebService.Configuration(NAMESPACE,
+        Configuration result = new Configuration(NAMESPACE,
                 METHOD_NAME,
                 PARAMETER_NAME_I,
                 PARAMETER_NAME_J,
+                PARAMETER_IMAGE_WIDTH,
                 SOAP_ACTION,
                 new Formatter().format(URL_FORMAT_STRING, text_server_name.getText().toString()).toString(),
-                this);
+                PARAMETER_ZOOM_LEVEL,
+                PARAMETER_IMAGE_HEIGHT, this);
 
         return new CallWebService(result);
     }
@@ -139,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         this.image_view.setImageBitmap(viewPortInfo.ReceivedImage);
         this.topX = viewPortInfo.TopX;
         this.topY = viewPortInfo.TopY;
+        this.zoomLevel = viewPortInfo.ZoomLevel;
     }
 }
 

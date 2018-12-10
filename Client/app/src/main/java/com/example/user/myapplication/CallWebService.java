@@ -7,14 +7,21 @@ import org.kobjects.base64.Base64;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-class CallWebService extends AsyncTask<Double, Void, ViewPortInfo> {
+class CallWebService extends AsyncTask<CallWebService.RequestParameters, Void, ViewPortInfo> {
 
     interface BitmapDisplay{
         void display(ViewPortInfo viewPortInfo);
+    }
+
+    static class RequestParameters{
+        Double i;
+        Double j;
+        Integer zoom_level;
+        Integer image_width;
+        Integer image_height;
     }
 
     static class Configuration{
@@ -23,6 +30,9 @@ class CallWebService extends AsyncTask<Double, Void, ViewPortInfo> {
         private String method_name;
         private String parameter_i;
         private String parameter_j;
+        private String parameter_zoom_level;
+        private String parameter_image_width;
+        private String parameter_image_height;
         private String soap_action;
         private BitmapDisplay bitmap_display;
 
@@ -30,15 +40,21 @@ class CallWebService extends AsyncTask<Double, Void, ViewPortInfo> {
                       String method_name,
                       String parameter_i,
                       String parameter_j,
+                      String parameter_image_width,
                       String soap_action,
                       String server_address,
+                      String parameter_zoom_level,
+                      String parameter_image_height,
                       BitmapDisplay bitmap_display) {
             this.namespace = namespace;
+            this.parameter_image_width = parameter_image_width;
             this.server_address = server_address;
             this.method_name = method_name;
             this.parameter_i = parameter_i;
             this.parameter_j = parameter_j;
             this.soap_action = soap_action;
+            this.parameter_zoom_level = parameter_zoom_level;
+            this.parameter_image_height = parameter_image_height;
             this.bitmap_display = bitmap_display;
         }
     }
@@ -55,22 +71,40 @@ class CallWebService extends AsyncTask<Double, Void, ViewPortInfo> {
     }
 
     @Override
-    protected ViewPortInfo doInBackground(Double... params) {
+    protected ViewPortInfo doInBackground(RequestParameters... params) {
+        RequestParameters parameters = params[0];
+
         SoapObject soapObject = new SoapObject(configuration.namespace, configuration.method_name);
 
         PropertyInfo propertyInfoI = new PropertyInfo();
         propertyInfoI.setName(configuration.parameter_i);
-        propertyInfoI.setValue(params[0]);
+        propertyInfoI.setValue(parameters.i);
         propertyInfoI.setType(Double.class);
-
         soapObject.addProperty(propertyInfoI);
 
         PropertyInfo propertyInfoJ = new PropertyInfo();
         propertyInfoJ.setName(configuration.parameter_j);
-        propertyInfoJ.setValue(params[1]);
+        propertyInfoJ.setValue(parameters.j);
         propertyInfoJ.setType(Double.class);
-
         soapObject.addProperty(propertyInfoJ);
+
+        PropertyInfo propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_zoom_level);
+        propertyInfo.setValue(parameters.zoom_level);
+        propertyInfo.setType(parameters.zoom_level.getClass());
+        soapObject.addProperty(propertyInfo);
+
+        propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_image_width);
+        propertyInfo.setValue(parameters.image_width);
+        propertyInfo.setType(parameters.image_width.getClass());
+        soapObject.addProperty(propertyInfo);
+
+        propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_image_height);
+        propertyInfo.setValue(parameters.image_height);
+        propertyInfo.setType(parameters.image_height.getClass());
+        soapObject.addProperty(propertyInfo);
 
         SoapSerializationEnvelope envelope =  new SoapSerializationEnvelope(SoapEnvelope.VER11);
         envelope.setOutputSoapObject(soapObject);
