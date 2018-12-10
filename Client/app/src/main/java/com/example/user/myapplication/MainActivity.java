@@ -5,18 +5,17 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import org.ksoap2.serialization.SoapObject;
+
 import java.util.Formatter;
-import java.util.logging.Logger;
 
 import static android.view.MotionEvent.ACTION_DOWN;
-import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 
 public class MainActivity extends AppCompatActivity implements CallWebService.BitmapDisplay {
@@ -24,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     EditText num_i;
     EditText num_j;
     EditText text_server_name;
-    Button button;
+    Button zoom_in;
     ImageView image_view;
 
     //String URL = "http://10.0.2.2:8080/CalculatorWS/CalculatorWS?WSDL";
@@ -40,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     String PARAMETER_NAME_I = "i";
     String PARAMETER_NAME_J = "j";
 
-    Float topX = 0f;
-    Float topY = 0f;
+    Double topX = 0d;
+    Double topY = 0d;
     Integer zoomLevel = 1;
 
 
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         num_i = (EditText) findViewById(R.id.num_i);
         num_j = (EditText)findViewById(R.id.num_j);
         text_server_name = (EditText)findViewById(R.id.text_server_name);
-        button = (Button)findViewById(R.id.button);
+        zoom_in = (Button)findViewById(R.id.zomm_in);
         image_view = (ImageView) findViewById(R.id.image_view);
 
         image_view.setOnTouchListener(new View.OnTouchListener() {
@@ -75,8 +74,6 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
                         float dY = moveStartedY - event.getY();
 
                         moveViewPort(dX, dY);
-
-                        //Log.i("onTouch","ACTION_UP");
                         break;
                 }
 
@@ -84,13 +81,10 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        zoom_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Double i = Double.parseDouble(num_i.getText().toString());
-                Double j = Double.parseDouble(num_j.getText().toString());
-
-                loadImage(i, j);
+                zoomLevel++;
             }
         });
 
@@ -144,7 +138,10 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     }
 
     @Override
-    public void display(Bitmap bitmap) {
-        this.image_view.setImageBitmap(bitmap);
+    public void display(ViewPortInfo viewPortInfo) {
+        this.image_view.setImageBitmap(viewPortInfo.ReceivedImage);
+        this.topX = viewPortInfo.TopX;
+        this.topY = viewPortInfo.TopY;
     }
 }
+

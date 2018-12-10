@@ -12,10 +12,10 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-class CallWebService extends AsyncTask<Double, Void, Bitmap> {
+class CallWebService extends AsyncTask<Double, Void, ViewPortInfo> {
 
     interface BitmapDisplay{
-        void display(Bitmap bitmap);
+        void display(ViewPortInfo viewPortInfo);
     }
 
     static class Configuration{
@@ -51,14 +51,12 @@ class CallWebService extends AsyncTask<Double, Void, Bitmap> {
     }
 
     @Override
-    protected void onPostExecute(Bitmap bitmap) {
+    protected void onPostExecute(ViewPortInfo bitmap) {
         configuration.bitmap_display.display(bitmap);
     }
 
     @Override
-    protected Bitmap doInBackground(Double... params) {
-        String result = "";
-
+    protected ViewPortInfo doInBackground(Double... params) {
         SoapObject soapObject = new SoapObject(configuration.namespace, configuration.method_name);
 
         PropertyInfo propertyInfoI = new PropertyInfo();
@@ -83,16 +81,20 @@ class CallWebService extends AsyncTask<Double, Void, Bitmap> {
 
         HttpTransportSE httpTransportSE = new HttpTransportSE(configuration.server_address);
 
+        ViewPortInfo viewPortInfo = null;
+
         try {
             httpTransportSE.call(configuration.soap_action, envelope);
-            SoapPrimitive soapPrimitive = (SoapPrimitive)envelope.getResponse();
-            result = soapPrimitive.toString();
+            SoapObject responseObject = (SoapObject)envelope.getResponse();
+            viewPortInfo = new ViewPortInfo(responseObject);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        byte[] bytearray = Base64.decode(result);
+        byte[] bytearray = Base64.decode(viewPortInfo.ImageData);
 
-        return BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length);
+        viewPortInfo.ReceivedImage = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length);
+
+        return viewPortInfo;
     }
 }

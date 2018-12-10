@@ -17,6 +17,9 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
@@ -26,24 +29,57 @@ import javax.imageio.ImageIO;
 @Stateless()
 public class CalculatorWS {
 
+    //@XmlAccessorType(XmlAccessType.FIELD)
+    //@XmlType(name = "ViewPortInfo", namespace="http://beans.book.acme.com/")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    //@XmlType(name = "ViewPortInfo")
+    static public class ViewPortInfo{
+        protected String ImageData;
+        protected Double TopX;
+        protected Double TopY;
+    }
+    
     /**
      * Web service operation
      */
     @WebMethod(operationName = "add")
-    public String add(@WebParam(name = "i") double i, @WebParam(name = "j") double j) {
+    public ViewPortInfo add(@WebParam(name = "i") double i, @WebParam(name = "j") double j) {
+        ViewPortInfo result = new ViewPortInfo();
         
-        String result = "";
+        //String result = "";
         
         ClassLoader classLoader = getClass().getClassLoader();
 	File file = new File(classLoader.getResource("Capture.PNG").getFile());
-        
-        int x = (int)Math.round(i);
-        int y = (int)Math.round(j);
-        
+       
         try {
             BufferedImage image = ImageIO.read(file);
             
-            image = image.getSubimage(x, y, 500, 500);
+            int x = (int)Math.round(i);
+            int y = (int)Math.round(j);
+            int width = 500;
+            int height = 500;
+            
+            if(x < 0)
+            {
+                x=0;
+            }
+            
+            if(x + width> image.getWidth())
+            {
+                x = image.getWidth() - width;
+            }
+            
+            if(y < 0)
+            {
+                y = 0;
+            }
+            
+            if(y + height > image.getHeight())
+            {
+                y = image.getHeight() - height;
+            }
+            
+            image = image.getSubimage(x, y, width, height);
             
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             ImageIO.write(image, "png", baos);
@@ -52,7 +88,9 @@ public class CalculatorWS {
             String base64String=Base64.encode(baos.toByteArray());
             baos.close();
             
-            result = base64String;
+            result.ImageData = base64String;
+            result.TopX = (double)x;
+            result.TopY = (double)y;
             
             
             Logger.getLogger(CalculatorWS.class.getName()).log(Level.INFO, null, image.getHeight());   
@@ -60,9 +98,6 @@ public class CalculatorWS {
             Logger.getLogger(CalculatorWS.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        
-        
-        double k = i + j;
         return result;
     }
 }
