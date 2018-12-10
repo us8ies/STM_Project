@@ -20,7 +20,7 @@
             tools:layout_editor_absoluteY="64dp" />
 
         <Button
-            android:id="@+id/zomm_in"
+            android:id="@+id/zoom_in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="268dp"
@@ -40,6 +40,18 @@
             android:text="mkonvisar.ddns.net"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="16dp" />
+
+        <Button
+            android:id="@+id/zoom_out"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/zoom_in"
+            android:layout_alignStart="@+id/image_view"
+            android:layout_alignLeft="@+id/image_view"
+            android:layout_marginStart="269dp"
+            android:layout_marginLeft="269dp"
+            android:layout_marginTop="9dp"
+            android:text="Zoom out" />
 
     </RelativeLayout>
 

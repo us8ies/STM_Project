@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
 
     EditText text_server_name;
     Button zoom_in;
+    Button zoom_out;
     ImageView image_view;
 
     //String URL = "http://10.0.2.2:8080/CalculatorWS/CalculatorWS?WSDL";
@@ -52,7 +52,8 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         setContentView(R.layout.activity_main);
 
         text_server_name = (EditText)findViewById(R.id.text_server_name);
-        zoom_in = (Button)findViewById(R.id.zomm_in);
+        zoom_in = (Button)findViewById(R.id.zoom_in);
+        zoom_out = (Button)findViewById(R.id.zoom_out);
         image_view = (ImageView) findViewById(R.id.image_view);
 
         image_view.setOnTouchListener(new View.OnTouchListener() {
@@ -84,6 +85,15 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
             @Override
             public void onClick(View v) {
                 zoomLevel++;
+
+                loadImage();
+            }
+        });
+
+        zoom_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoomLevel--;
 
                 loadImage();
             }
