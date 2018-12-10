@@ -1,6 +1,5 @@
 package com.example.user.myapplication;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 

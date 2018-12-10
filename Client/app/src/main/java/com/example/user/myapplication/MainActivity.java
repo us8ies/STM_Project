@@ -1,7 +1,6 @@
 package com.example.user.myapplication;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,8 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import org.ksoap2.serialization.SoapObject;
 
 import java.util.Formatter;
 
