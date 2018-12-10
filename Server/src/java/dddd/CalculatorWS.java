@@ -40,6 +40,8 @@ public class CalculatorWS {
         try {
             BufferedImage image = ImageIO.read(file);
             
+            image = image.getSubimage(300, 500, 500, 500);
+            
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             ImageIO.write(image, "png", baos);
             baos.flush();
