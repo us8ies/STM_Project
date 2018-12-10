@@ -30,8 +30,11 @@ import javax.xml.bind.annotation.XmlType;
 @Stateless()
 public class CalculatorWS {
     
-    Double offsetX = 53.132401d;
-    Double offsetY = 17.983770d;
+    private static final Double offsetX = 53.132401d;
+    private static final Double offsetY = 17.983770d;
+    private static final int[] zoom_width = {1000, 900, 800, 700, 600, 500, 400, 300, 200, 100};
+    private static final String BYDGOSZCZ_PNG = "Bydgoszcz.PNG";
+    
 
     @XmlAccessorType(XmlAccessType.FIELD)
     static public class ViewPortInfo{
@@ -51,70 +54,88 @@ public class CalculatorWS {
             @WebParam(name = "image_width") int image_width,
             @WebParam(name = "image_height") int image_height) {
         ViewPortInfo result = new ViewPortInfo();
-                
-        ClassLoader classLoader = getClass().getClassLoader();
-	File file = new File(classLoader.getResource("Bydgoszcz.PNG").getFile());
+
+        zoom_level = ValidateZoomLevel(zoom_level);
         
-        int[] zoom_width = {1000, 900, 800, 700, 600, 500, 400, 300, 200, 100};
-       
-        if(zoom_level < 0)
-            zoom_level = 0;
+        int ref_width = zoom_width[zoom_level];
+        int ref_height = (int)((double)ref_width/((double)image_width/(double)image_height));
         
-        if(zoom_level > 9)
-            zoom_level = 9;
+        int ref_x = LatitudeToWidth(i);
+        int ref_y = LongitudeToHeight(j); 
         
         try {
-            BufferedImage image = ImageIO.read(file);
+            BufferedImage refImage = GetReferenceImage();
             
-            int x = LatitudeToWidth(i);
-            int y = LongitudeToHeight(j);
+            ref_x = ValidateWidth(ref_x, ref_width, refImage);
+            ref_y = ValidateHeight(ref_y, ref_height, refImage);
             
-            int width = zoom_width[zoom_level];
-            int height = (int)((double)width/((double)image_width/(double)image_height));
-            
-            if(x < 0)
-            {
-                x=0;
-            }
-            
-            if(x + width> image.getWidth())
-            {
-                x = image.getWidth() - width;
-            }
-            
-            if(y < 0)
-            {
-                y = 0;
-            }
-            
-            if(y + height > image.getHeight())
-            {
-                y = image.getHeight() - height;
-            }
-            
-            image = image.getSubimage(x, y, width, height);
-            
-            Image scaledImage = image.getScaledInstance(image_width, image_height, width);
-            
-            image = new BufferedImage(image_width, image_height, image.getType());
-            image.getGraphics().drawImage(scaledImage, 0, 0 , null);
-            
-            ByteArrayOutputStream baos=new ByteArrayOutputStream();
-            ImageIO.write(image, "png", baos);
-            baos.flush();
-
-            String base64String=Base64.encode(baos.toByteArray());
-            baos.close();
-            
-            result.ImageData = base64String;
-            result.TopX = WidthToLatitude(x);// (double)x;
-            result.TopY = HeightToLongitude(y);// (double)y;
+            refImage = GetClientImage(refImage, ref_x, ref_y, ref_width, ref_height, image_width, image_height);
+                        
+            result.ImageData = SerializeImage(refImage);
+            result.TopX = WidthToLatitude(ref_x);
+            result.TopY = HeightToLongitude(ref_y);
             result.ZoomLevel = zoom_level;  
         } catch (IOException ex) {
             Logger.getLogger(CalculatorWS.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return result;
+    }
+
+    private BufferedImage GetReferenceImage() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(BYDGOSZCZ_PNG).getFile());
+        BufferedImage image = ImageIO.read(file);
+        return image;
+    }
+
+    private int ValidateZoomLevel(int zoom_level) {
+        if(zoom_level < 0)
+            zoom_level = 0;
+        if(zoom_level > zoom_width.length)
+            zoom_level = zoom_width.length;
+        return zoom_level;
+    }
+
+    private String SerializeImage(BufferedImage image) throws IOException {
+        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+        ImageIO.write(image, "png", baos);
+        baos.flush();
+        String base64String=Base64.encode(baos.toByteArray());
+        baos.close();
+        return base64String;
+    }
+
+    private BufferedImage GetClientImage(BufferedImage source_image, int x, int y, int width, int height, int scaled_width, int scaled_height) {
+        source_image = source_image.getSubimage(x, y, width, height);
+        Image scaledImage = source_image.getScaledInstance(scaled_width, scaled_height, width);
+        BufferedImage result = new BufferedImage(scaled_width, scaled_height, source_image.getType());
+        result.getGraphics().drawImage(scaledImage, 0, 0 , null);
+        return result;
+    }
+
+    private int ValidateHeight(int y, int height, BufferedImage image) {
+        if(y < 0)
+        {
+            y = 0;
+        }
+        if(y + height > image.getHeight())
+        {
+            y = image.getHeight() - height;
+        }
+        return y;
+    }
+
+    private int ValidateWidth(int x, int width, BufferedImage image) {
+        if(x < 0)
+        {
+            x=0;
+        }
+        if(x + width> image.getWidth())
+        {
+            x = image.getWidth() - width;
+        }
+        return x;
     }
     
     int LatitudeToWidth(Double latitude){
