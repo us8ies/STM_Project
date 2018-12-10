@@ -1,5 +1,7 @@
 package com.example.user.myapplication;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,8 +9,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.kobjects.base64.Base64;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
@@ -26,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     EditText text_server_name;
     Button button;
     TextView text_result;
+    ImageView image_view;
 
     //String URL = "http://10.0.2.2:8080/CalculatorWS/CalculatorWS?WSDL";
     //String URL = "http://mkonvisar.ddns.net:8080/CalculatorWS/CalculatorWS?WSDL";
@@ -47,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         text_server_name = (EditText)findViewById(R.id.text_server_name);
         button = (Button)findViewById(R.id.button);
         text_result = (TextView)findViewById(R.id.text_result);
+        image_view = (ImageView) findViewById(R.id.image_view);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    class CallWebService extends AsyncTask<Double, Void, String> {
+    class CallWebService extends AsyncTask<Double, Void, Bitmap> {
 
         String server_name;
 
@@ -72,12 +78,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            text_result.setText("Square = " + s);
+        protected void onPostExecute(Bitmap s) {
+
+            image_view.setImageBitmap(s);
+            //text_result.setText("Square = " + s);
         }
 
         @Override
-        protected String doInBackground(Double... params) {
+        protected Bitmap doInBackground(Double... params) {
             String result = "";
 
             SoapObject soapObject = new SoapObject(NAMESPACE, METHOD_NAME);
@@ -112,7 +120,11 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            return result;
+            byte[] bytearray = Base64.decode(result);
+
+            Bitmap bm = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length);
+
+            return bm;
         }
     }
 }
