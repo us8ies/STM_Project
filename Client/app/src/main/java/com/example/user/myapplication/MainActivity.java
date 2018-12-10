@@ -1,15 +1,23 @@
 package com.example.user.myapplication;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.util.Formatter;
+import java.util.logging.Logger;
+
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
 
 public class MainActivity extends AppCompatActivity implements CallWebService.BitmapDisplay {
 
@@ -32,6 +40,12 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     String PARAMETER_NAME_I = "i";
     String PARAMETER_NAME_J = "j";
 
+    Float topX = 0f;
+    Float topY = 0f;
+    Integer zoomLevel = 1;
+
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,17 +57,57 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         button = (Button)findViewById(R.id.button);
         image_view = (ImageView) findViewById(R.id.image_view);
 
+        image_view.setOnTouchListener(new View.OnTouchListener() {
+            Float moveStartedX = 0f;
+            Float moveStartedY = 0f;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()){
+                    case ACTION_DOWN:
+                        moveStartedX = event.getX();
+                        moveStartedY = event.getY();
+                        break;
+                    case ACTION_UP:
+
+                        float dX = moveStartedX - event.getX();
+                        float dY = moveStartedY - event.getY();
+
+                        moveViewPort(dX, dY);
+
+                        //Log.i("onTouch","ACTION_UP");
+                        break;
+                }
+
+                return true;
+            }
+        });
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Double i = Double.parseDouble(num_i.getText().toString());
                 Double j = Double.parseDouble(num_j.getText().toString());
 
-                getSoapService().execute(i,j);
+                loadImage(i, j);
             }
         });
 
         initServerAddress();
+
+        moveViewPort(0f, 0f);
+    }
+
+    private void moveViewPort(float dX, float dY){
+        this.topX += dX;
+        this.topY += dY;
+
+        loadImage(this.topX, this.topY);
+    }
+
+    private void loadImage(double i, double j){
+        getSoapService().execute(i, j);
     }
 
     private CallWebService getSoapService(){

@@ -37,10 +37,13 @@ public class CalculatorWS {
         ClassLoader classLoader = getClass().getClassLoader();
 	File file = new File(classLoader.getResource("Capture.PNG").getFile());
         
+        int x = (int)Math.round(i);
+        int y = (int)Math.round(j);
+        
         try {
             BufferedImage image = ImageIO.read(file);
             
-            image = image.getSubimage(300, 500, 500, 500);
+            image = image.getSubimage(x, y, 500, 500);
             
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             ImageIO.write(image, "png", baos);
