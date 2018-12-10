@@ -25,8 +25,6 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     Button zoom_out;
     ImageView image_view;
 
-    //String URL = "http://10.0.2.2:8080/CalculatorWS/CalculatorWS?WSDL";
-    //String URL = "http://mkonvisar.ddns.net:8080/CalculatorWS/CalculatorWS?WSDL";
     //String URL = "http://109.241.140.113:8080/CalculatorWS/CalculatorWS?WSDL";
     String URL_FORMAT_STRING = "http://%s:8080/CalculatorWS/CalculatorWS?WSDL";
     String EMULATOR_SERVER_ADDRESS = "10.0.2.2";
@@ -45,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     Double topY = 17.983770d;
     Integer zoomLevel = 1;
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +53,26 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         zoom_out = (Button)findViewById(R.id.zoom_out);
         image_view = (ImageView) findViewById(R.id.image_view);
 
+        initializeSwipeOperations();
+
+        initializeButtons();
+
+        initServerAddress();
+
+        delayInitialLoad();
+    }
+
+    private void delayInitialLoad() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadImage();
+            }
+        }, 1000);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initializeSwipeOperations() {
         image_view.setOnTouchListener(new View.OnTouchListener() {
             Float moveStartedX = 0f;
             Float moveStartedY = 0f;
@@ -80,7 +97,9 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
                 return true;
             }
         });
+    }
 
+    private void initializeButtons() {
         zoom_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,16 +117,6 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
                 loadImage();
             }
         });
-
-        initServerAddress();
-
-        //needed for all views to inflate
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadImage();
-            }
-        }, 1000);
     }
 
     private void moveViewPort(float dX, float dY){

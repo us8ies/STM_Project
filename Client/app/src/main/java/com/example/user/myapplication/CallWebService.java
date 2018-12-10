@@ -76,35 +76,7 @@ class CallWebService extends AsyncTask<CallWebService.RequestParameters, Void, V
 
         SoapObject soapObject = new SoapObject(configuration.namespace, configuration.method_name);
 
-        PropertyInfo propertyInfoI = new PropertyInfo();
-        propertyInfoI.setName(configuration.parameter_i);
-        propertyInfoI.setValue(parameters.i);
-        propertyInfoI.setType(Double.class);
-        soapObject.addProperty(propertyInfoI);
-
-        PropertyInfo propertyInfoJ = new PropertyInfo();
-        propertyInfoJ.setName(configuration.parameter_j);
-        propertyInfoJ.setValue(parameters.j);
-        propertyInfoJ.setType(Double.class);
-        soapObject.addProperty(propertyInfoJ);
-
-        PropertyInfo propertyInfo = new PropertyInfo();
-        propertyInfo.setName(configuration.parameter_zoom_level);
-        propertyInfo.setValue(parameters.zoom_level);
-        propertyInfo.setType(parameters.zoom_level.getClass());
-        soapObject.addProperty(propertyInfo);
-
-        propertyInfo = new PropertyInfo();
-        propertyInfo.setName(configuration.parameter_image_width);
-        propertyInfo.setValue(parameters.image_width);
-        propertyInfo.setType(parameters.image_width.getClass());
-        soapObject.addProperty(propertyInfo);
-
-        propertyInfo = new PropertyInfo();
-        propertyInfo.setName(configuration.parameter_image_height);
-        propertyInfo.setValue(parameters.image_height);
-        propertyInfo.setType(parameters.image_height.getClass());
-        soapObject.addProperty(propertyInfo);
+        populateArguments(parameters, soapObject);
 
         SoapSerializationEnvelope envelope =  new SoapSerializationEnvelope(SoapEnvelope.VER11);
         envelope.setOutputSoapObject(soapObject);
@@ -129,5 +101,37 @@ class CallWebService extends AsyncTask<CallWebService.RequestParameters, Void, V
         viewPortInfo.ReceivedImage = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.length);
 
         return viewPortInfo;
+    }
+
+    private void populateArguments(RequestParameters parameters, SoapObject soapObject) {
+        PropertyInfo propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_i);
+        propertyInfo.setValue(parameters.i);
+        propertyInfo.setType(parameters.i.getClass());
+        soapObject.addProperty(propertyInfo);
+
+        propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_j);
+        propertyInfo.setValue(parameters.j);
+        propertyInfo.setType(parameters.j.getClass());
+        soapObject.addProperty(propertyInfo);
+
+        propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_zoom_level);
+        propertyInfo.setValue(parameters.zoom_level);
+        propertyInfo.setType(parameters.zoom_level.getClass());
+        soapObject.addProperty(propertyInfo);
+
+        propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_image_width);
+        propertyInfo.setValue(parameters.image_width);
+        propertyInfo.setType(parameters.image_width.getClass());
+        soapObject.addProperty(propertyInfo);
+
+        propertyInfo = new PropertyInfo();
+        propertyInfo.setName(configuration.parameter_image_height);
+        propertyInfo.setValue(parameters.image_height);
+        propertyInfo.setType(parameters.image_height.getClass());
+        soapObject.addProperty(propertyInfo);
     }
 }
