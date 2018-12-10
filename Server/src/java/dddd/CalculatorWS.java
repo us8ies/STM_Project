@@ -92,8 +92,8 @@ public class CalculatorWS {
     private int ValidateZoomLevel(int zoom_level) {
         if(zoom_level < 0)
             zoom_level = 0;
-        if(zoom_level > zoom_width.length)
-            zoom_level = zoom_width.length;
+        if(zoom_level >= zoom_width.length)
+            zoom_level = zoom_width.length - 1;
         return zoom_level;
     }
 
