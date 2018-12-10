@@ -2,10 +2,12 @@ package com.example.user.myapplication;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,8 +21,6 @@ import static android.view.MotionEvent.ACTION_UP;
 
 public class MainActivity extends AppCompatActivity implements CallWebService.BitmapDisplay {
 
-    EditText num_i;
-    EditText num_j;
     EditText text_server_name;
     Button zoom_in;
     ImageView image_view;
@@ -51,8 +51,6 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        num_i = (EditText) findViewById(R.id.num_i);
-        num_j = (EditText)findViewById(R.id.num_j);
         text_server_name = (EditText)findViewById(R.id.text_server_name);
         zoom_in = (Button)findViewById(R.id.zomm_in);
         image_view = (ImageView) findViewById(R.id.image_view);
@@ -93,7 +91,13 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
 
         initServerAddress();
 
-        moveViewPort(0f, 0f);
+        //needed for all views to inflate
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadImage();
+            }
+        }, 1000);
     }
 
     private void moveViewPort(float dX, float dY){
@@ -109,18 +113,11 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
         parameters.i = this.topX;
         parameters.j = this.topY;
         parameters.zoom_level = zoomLevel;
-        parameters.image_width = image_view.getLayoutParams().width;
-        parameters.image_height = image_view.getLayoutParams().height;
+        parameters.image_width = image_view.getMeasuredWidth();
+        parameters.image_height = image_view.getMeasuredHeight();
 
         getSoapService().execute(parameters);
     }
-
-
-    public int convertDipToPixels(float dips)
-    {
-        return (int) (dips * getResources().getDisplayMetrics().density + 0.5f);
-    }
-
 
     private CallWebService getSoapService(){
         Configuration result = new Configuration(NAMESPACE,

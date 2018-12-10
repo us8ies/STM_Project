@@ -53,7 +53,7 @@ public class CalculatorWS {
         ViewPortInfo result = new ViewPortInfo();
                 
         ClassLoader classLoader = getClass().getClassLoader();
-	File file = new File(classLoader.getResource("Capture.PNG").getFile());
+	File file = new File(classLoader.getResource("Bydgoszcz.PNG").getFile());
         
         int[] zoom_width = {1000, 900, 800, 700, 600, 500, 400, 300, 200, 100};
        
