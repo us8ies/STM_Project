@@ -41,8 +41,8 @@ public class MainActivity extends AppCompatActivity implements CallWebService.Bi
     String PARAMETER_IMAGE_HEIGHT = "image_height";
     String PARAMETER_ZOOM_LEVEL = "zoom_level";
 
-    Double topX = 0d;
-    Double topY = 0d;
+    Double topX = 53.132401d;
+    Double topY = 17.983770d;
     Integer zoomLevel = 1;
 
     @SuppressLint("ClickableViewAccessibility")

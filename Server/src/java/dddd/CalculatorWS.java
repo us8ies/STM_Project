@@ -29,11 +29,11 @@ import javax.xml.bind.annotation.XmlType;
 @WebService(serviceName = "CalculatorWS")
 @Stateless()
 public class CalculatorWS {
+    
+    Double offsetX = 53.132401d;
+    Double offsetY = 17.983770d;
 
-    //@XmlAccessorType(XmlAccessType.FIELD)
-    //@XmlType(name = "ViewPortInfo", namespace="http://beans.book.acme.com/")
     @XmlAccessorType(XmlAccessType.FIELD)
-    //@XmlType(name = "ViewPortInfo")
     static public class ViewPortInfo{
         protected String ImageData;
         protected Double TopX;
@@ -66,8 +66,8 @@ public class CalculatorWS {
         try {
             BufferedImage image = ImageIO.read(file);
             
-            int x = (int)Math.round(i);
-            int y = (int)Math.round(j);
+            int x = LatitudeToWidth(i);
+            int y = LongitudeToHeight(j);
             
             int width = zoom_width[zoom_level];
             int height = (int)((double)width/((double)image_width/(double)image_height));
@@ -107,16 +107,29 @@ public class CalculatorWS {
             baos.close();
             
             result.ImageData = base64String;
-            result.TopX = (double)x;
-            result.TopY = (double)y;
-            result.ZoomLevel = zoom_level;
-            
-            
-            Logger.getLogger(CalculatorWS.class.getName()).log(Level.INFO, null, image.getHeight());   
+            result.TopX = WidthToLatitude(x);// (double)x;
+            result.TopY = HeightToLongitude(y);// (double)y;
+            result.ZoomLevel = zoom_level;  
         } catch (IOException ex) {
             Logger.getLogger(CalculatorWS.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return result;
+    }
+    
+    int LatitudeToWidth(Double latitude){
+        return (int)Math.round(latitude - offsetX);
+    }
+    
+    int LongitudeToHeight(Double longitude){
+        return (int)Math.round(longitude - offsetY);
+    }
+    
+    double WidthToLatitude(int width){
+        return (double)width + offsetX;
+    }
+    
+    double HeightToLongitude(int height){
+        return (double)height + offsetY;
     }
 }
