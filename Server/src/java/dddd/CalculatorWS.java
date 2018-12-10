@@ -69,9 +69,9 @@ public class CalculatorWS {
             ref_x = ValidateWidth(ref_x, ref_width, refImage);
             ref_y = ValidateHeight(ref_y, ref_height, refImage);
             
-            refImage = GetClientImage(refImage, ref_x, ref_y, ref_width, ref_height, image_width, image_height);
+            BufferedImage clientImage = GetClientImage(refImage, ref_x, ref_y, ref_width, ref_height, image_width, image_height);
                         
-            result.ImageData = SerializeImage(refImage);
+            result.ImageData = SerializeImage(clientImage);
             result.TopX = WidthToLatitude(ref_x);
             result.TopY = HeightToLongitude(ref_y);
             result.ZoomLevel = zoom_level;  
